@@ -42,4 +42,5 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('api/v1/arcticlelist/', ArcticleAPIView.as_view()),
+    path('api/v1/arcticlelist/<int:pk>', ArcticleAPIView.as_view()),
 ]
