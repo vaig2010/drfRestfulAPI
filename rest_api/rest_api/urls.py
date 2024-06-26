@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
-from users.views import UserRegisterView, UserLoginView, ArcticleAPIView
+from users.views import UserRegisterView, UserLoginView, ArcticleAPIView, ArcticleListAPIView
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -41,6 +41,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
-    path('api/v1/arcticlelist/', ArcticleAPIView.as_view()),
-    path('api/v1/arcticlelist/<int:pk>', ArcticleAPIView.as_view()),
+    path('api/v1/arcticlelist/', ArcticleListAPIView.as_view()),
+    path('api/v1/arcticlelist/<int:pk>/', ArcticleAPIView.as_view()),
 ]

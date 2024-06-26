@@ -7,7 +7,7 @@ from .models import CustomUser, Arcticle
 from .serializers import UserSerializer, UserLoginSerializer, ArcticleSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView 
 from django.contrib.auth import get_user_model
 from django.utils.functional import SimpleLazyObject
 
@@ -34,34 +34,25 @@ class UserLoginView(APIView):
             'access': str(refresh.access_token),
         })
         
-
-class ArcticleAPIView(ListCreateAPIView):
+class ArcticleListAPIView(ListCreateAPIView):
     queryset = Arcticle.objects.all()
     serializer_class = ArcticleSerializer
-    def get(self, request):
-        articles = self.get_queryset()
-        serializer = self.get_serializer(articles, many=True)
-        return Response({"posts": serializer.data})
-    
-    def post(self, request):
-        serializer = ArcticleSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = request.user
-            if isinstance(user, SimpleLazyObject):
-                user = CustomUser.objects.filter(id=user.id).first()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = CustomUser.objects.filter(id=self.request.user.id).first()
         serializer.save(author=user)
-        return Response(serializer.data)
+
+class ArcticleAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Arcticle.objects.all()
+    serializer_class = ArcticleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = CustomUser.objects.filter(id=self.request.user.id).first()
+        serializer.save(author=user)
     
-    def put(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
-        try:
-            instance = Arcticle.objects.get(pk=pk)
-        except Arcticle.DoesNotExist:
-            return Response({"error": "Object does not exist"})
-        serializer = ArcticleSerializer(data=request.data, instance=instance)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+    def perform_update(self, serializer):
+        user = CustomUser.objects.filter(id=self.request.user.id).first()
+        serializer.save(author=user)
+        
