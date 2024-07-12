@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Arcticle(models.Model):
     title = models.CharField(max_length=200)
@@ -7,11 +8,7 @@ class Arcticle(models.Model):
 
     def __str__(self):
         return self.title
-    
-    # models.py
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
+
 
 class ReferralCode(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

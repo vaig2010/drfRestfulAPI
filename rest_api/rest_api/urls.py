@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
-from users.views import ArcticleViewSet, UserRegisterView, UserLoginView
+from users.views import ArcticleViewSet, UserRegisterView, UserLoginView, ReferralCodeViewSet
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -40,6 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'arcticles', ArcticleViewSet, basename='arcticle')
+router.register(r'referral', ReferralCodeViewSet, basename='referral')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -50,5 +51,5 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify')
 ]

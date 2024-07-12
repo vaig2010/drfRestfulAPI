@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
-from .models import Arcticle
-from .serializers import UserLoginSerializer, ArcticleSerializer, UserRegistrationSerializer
+from .models import Arcticle, ReferralCode
+from .serializers import UserLoginSerializer, ArcticleSerializer, UserRegistrationSerializer, ReferralCodeSerializer
 from django.contrib.auth.models import User
 
 class UserRegisterView(generics.CreateAPIView):
@@ -33,4 +33,10 @@ class ArcticleViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated
     ]
-        
+
+class ReferralCodeViewSet(viewsets.ModelViewSet):
+    queryset = ReferralCode.objects.all()
+    serializer_class = ReferralCodeSerializer
+    permission_classes = [
+        IsAuthenticated
+    ]
