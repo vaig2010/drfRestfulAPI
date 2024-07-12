@@ -12,7 +12,7 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 class ArcticleSerializer(serializers.ModelSerializer):
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    id = serializers.IntegerField(read_only=True)
     class Meta:
         model = Arcticle
         fields = ['title', 'content', 'author']
