@@ -1,21 +1,48 @@
-# users/serializers.py
 from rest_framework import serializers
-from .models import CustomUser, Arcticle, ReferralCode
+from .models import  Arcticle, ReferralCode
+from django.contrib.auth.models import User
 
-class UserSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
-        model = CustomUser
-        fields = ['email', 'password']
+        model = User
+        fields = ['username', 'email', 'password']
+    def validate_email(self, value):
+        if value and User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with that email already exists.")
+        return value
+    def create(self, validated_data):
+        user = User(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 class UserLoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField()
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        if username and password:
+            user = User.objects.filter(username=username).first()
+            if user and user.check_password(password):
+                return user
+            else:
+                raise serializers.ValidationError('Invalid Credentials')
+        else:
+            raise serializers.ValidationError('Must include "username" and "password"')
+        
 class ArcticleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     class Meta:
         model = Arcticle
-        fields = ['title', 'content', 'author']
+        fields = ['id', 'title', 'content']
         
 
 class ReferralCodeSerializer(serializers.ModelSerializer):
