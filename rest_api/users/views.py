@@ -45,6 +45,5 @@ class ArcticleViewSet(viewsets.ModelViewSet):
 class ReferralCodeViewSet(viewsets.ModelViewSet):
     queryset = ReferralCode.objects.all()
     serializer_class = ReferralCodeSerializer
-    permission_classes = [
-        IsAdminUser
-    ]
+    permission_classes = [IsAuthenticated]
+    
