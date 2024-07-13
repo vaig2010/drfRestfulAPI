@@ -55,8 +55,8 @@ class ArcticleSerializer(serializers.ModelSerializer):
 class ReferralCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReferralCode
-        fields = ['code', 'expiration_date']
-        read_only_fields = ['code', 'expiration_date']
+        fields = ['id', 'code', 'expiration_date']
+        read_only_fields = ['id', 'code', 'expiration_date']
     
     def validate(self, attrs):
         user = self.context['request'].user

@@ -43,6 +43,11 @@ class ReferralCodeViewSet(viewsets.ModelViewSet):
     queryset = ReferralCode.objects.all()
     serializer_class = ReferralCodeSerializer
     permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        # Filter queryset to only show ReferralCodes of the authenticated user
+        user = self.request.user
+        return ReferralCode.objects.filter(user=user)
     def generate_unique_code(self):
         while True:
             code = str(uuid.uuid4()).replace("-", "")[:20]
@@ -51,13 +56,22 @@ class ReferralCodeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-    
         # Generate unique code
         code = self.generate_unique_code()
-        
         # Set expiration date to 30 days from now
         expiration_date = timezone.now() + timezone.timedelta(days=30)
-        
         # Create the referral code instance
         serializer.save(user=user, code=code, expiration_date=expiration_date)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Check if the instance belongs to the authenticated user
+        if instance.user != request.user:
+            return Response({"error": "You do not have permission to delete this referral code."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        self.perform_destroy(instance)
+        return Response({"message": "Referral code deleted successfully.","code": instance.code}, status=status.HTTP_204_NO_CONTENT)
+    
         
