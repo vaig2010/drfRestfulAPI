@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import  Arcticle, ReferralCode
 from django.contrib.auth.models import User
 
+# Serializers define the API representation.
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'is_staff']
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 

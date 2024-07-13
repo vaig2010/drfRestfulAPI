@@ -3,11 +3,19 @@ from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Arcticle, ReferralCode
-from .serializers import UserLoginSerializer, ArcticleSerializer, UserRegistrationSerializer, ReferralCodeSerializer
+from .serializers import (UserLoginSerializer, ArcticleSerializer,
+                          UserSerializer, UserRegistrationSerializer,
+                          ReferralCodeSerializer)
 from django.contrib.auth.models import User
 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [
+        IsAdminUser
+    ]
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
@@ -38,5 +46,5 @@ class ReferralCodeViewSet(viewsets.ModelViewSet):
     queryset = ReferralCode.objects.all()
     serializer_class = ReferralCodeSerializer
     permission_classes = [
-        IsAuthenticated
+        IsAdminUser
     ]
