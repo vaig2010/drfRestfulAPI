@@ -1,4 +1,5 @@
 # users/views.py
+import uuid
 from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,13 +10,11 @@ from .serializers import (UserLoginSerializer, ArcticleSerializer,
                           UserSerializer, UserRegistrationSerializer,
                           ReferralCodeSerializer)
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [
-        IsAdminUser
-    ]
+    permission_classes = [IsAdminUser]
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
@@ -38,12 +37,27 @@ class UserLoginView(APIView):
 class ArcticleViewSet(viewsets.ModelViewSet):
     queryset = Arcticle.objects.all()
     serializer_class = ArcticleSerializer
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
 class ReferralCodeViewSet(viewsets.ModelViewSet):
     queryset = ReferralCode.objects.all()
     serializer_class = ReferralCodeSerializer
     permission_classes = [IsAuthenticated]
+    def generate_unique_code(self):
+        while True:
+            code = str(uuid.uuid4()).replace("-", "")[:20]
+            if not ReferralCode.objects.filter(code=code).exists():
+                return code
+
+    def perform_create(self, serializer):
+        user = self.request.user
     
+        # Generate unique code
+        code = self.generate_unique_code()
+        
+        # Set expiration date to 30 days from now
+        expiration_date = timezone.now() + timezone.timedelta(days=30)
+        
+        # Create the referral code instance
+        serializer.save(user=user, code=code, expiration_date=expiration_date)
+        
