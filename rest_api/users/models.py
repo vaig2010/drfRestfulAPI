@@ -18,3 +18,8 @@ class ReferralCode(models.Model):
 
     def is_active(self):
         return self.expiration_date > timezone.now()
+
+class Referral(models.Model):
+    referrer = models.ForeignKey(User, related_name='referrals', on_delete=models.CASCADE)
+    referee = models.OneToOneField(User, related_name='referred_by', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

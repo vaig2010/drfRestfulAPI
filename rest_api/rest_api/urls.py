@@ -19,7 +19,8 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
 from users.views import (ArcticleViewSet, UserRegisterView, UserLoginView,
-                         UserViewSet, ReferralCodeViewSet, GetReferralCodeByEmailView)
+                         UserViewSet, ReferralCodeViewSet, GetReferralCodeByEmailView,
+                         RegisterWithReferralCodeView)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView, TokenRefreshView, TokenVerifyView
 )
@@ -38,6 +39,7 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('api/v1/referral/by-email/', GetReferralCodeByEmailView.as_view(), name='get_referral_by_email'),
+    path('api/v1/register/referral/', RegisterWithReferralCodeView.as_view(), name='register_with_referral'),
     path('api/v1/', include(router.urls)),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

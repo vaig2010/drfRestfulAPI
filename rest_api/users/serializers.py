@@ -1,6 +1,6 @@
 import uuid
 from rest_framework import serializers
-from .models import  Arcticle, ReferralCode
+from .models import Arcticle, ReferralCode, Referral
 from django.contrib.auth.models import User
 from django.utils import timezone
 # Serializers define the API representation.
@@ -67,4 +67,10 @@ class ReferralCodeSerializer(serializers.ModelSerializer):
         return attrs
         
 
+class ReferralSerializer(serializers.ModelSerializer):
+    referrer = UserSerializer()
+    referee = UserSerializer()
 
+    class Meta:
+        model = Referral
+        fields = ['referrer', 'referee', 'created_at']

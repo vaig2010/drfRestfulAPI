@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Arcticle, ReferralCode
+from .models import Arcticle, ReferralCode, Referral
 from .serializers import (UserLoginSerializer, ArcticleSerializer,
                           UserSerializer, UserRegistrationSerializer,
                           ReferralCodeSerializer)
@@ -91,4 +91,24 @@ class GetReferralCodeByEmailView(generics.RetrieveAPIView):
         return Response({"message": "Referral code not found for the given email."}, status=status.HTTP_404_NOT_FOUND)
         
     
-    
+class RegisterWithReferralCodeView(APIView):
+    def post(self, request, *args, **kwargs):
+        referral_code = request.data.get('referral_code')
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not referral_code or not username or not password:
+            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            referral = ReferralCode.objects.get(code=referral_code)
+        except ReferralCode.DoesNotExist:
+            return Response({"error": "Invalid referral code."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not referral.is_active():
+            return Response({"error": "Referral code is expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create_user(username=username, password=password)
+        Referral.objects.create(referrer=referral.user, referee=user)
+        
+        return Response({"success": "User registered successfully."}, status=status.HTTP_201_CREATED)
