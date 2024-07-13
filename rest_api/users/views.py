@@ -74,4 +74,21 @@ class ReferralCodeViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response({"message": "Referral code deleted successfully.","code": instance.code}, status=status.HTTP_204_NO_CONTENT)
     
+
+class GetReferralCodeByEmailView(generics.RetrieveAPIView):
+    queryset = ReferralCode.objects.all()
+    serializer_class = ReferralCodeSerializer
+    
+    def get(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+        print(user)
+        if user:
+            referral_code = ReferralCode.objects.filter(user=user).first()
+            if referral_code:
+                serializer = self.get_serializer(referral_code)
+                return Response(serializer.data)
+        return Response({"message": "Referral code not found for the given email."}, status=status.HTTP_404_NOT_FOUND)
         
+    
+    
