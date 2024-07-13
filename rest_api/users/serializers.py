@@ -57,16 +57,14 @@ class ReferralCodeSerializer(serializers.ModelSerializer):
         model = ReferralCode
         fields = ['code', 'expiration_date']
         read_only_fields = ['code', 'expiration_date']
-    def generate_unique_code(self):
-        while True:
-            code = str(uuid.uuid4()).replace("-", "")[:20]
-            if not ReferralCode.objects.filter(code=code).exists():
-                return code
-    def create(self, validated_data):
-        ref_code = ReferralCode(
-            user=self.context['request'].user,
-            code=self.generate_unique_code(),
-            expiration_date=timezone.now() + timezone.timedelta(days=7),
-        )
-        ref_code.save()
-        return ref_code
+    
+    def validate(self, attrs):
+        user = self.context['request'].user
+        # Check if the user already has a ReferralCode
+        existing_code = ReferralCode.objects.filter(user=user).first()
+        if existing_code:
+            raise serializers.ValidationError("User already has a ReferralCode")
+        return attrs
+        
+
+
