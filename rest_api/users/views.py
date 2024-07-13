@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Arcticle, ReferralCode, Referral
-from .serializers import (UserLoginSerializer, ArcticleSerializer,
+from .serializers import (ReferralSerializer, UserLoginSerializer, ArcticleSerializer,
                           UserSerializer, UserRegistrationSerializer,
                           ReferralCodeSerializer)
 from django.contrib.auth.models import User
@@ -112,3 +112,14 @@ class RegisterWithReferralCodeView(APIView):
         Referral.objects.create(referrer=referral.user, referee=user)
         
         return Response({"success": "User registered successfully."}, status=status.HTTP_201_CREATED)
+
+class ReferralListView(APIView):
+    def get(self, request, referrer_id, *args, **kwargs):
+        try:
+            referrer = User.objects.get(id=referrer_id)
+        except User.DoesNotExist:
+            return Response({"error": "Referrer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        referrals = Referral.objects.filter(referrer=referrer)
+        serializer = ReferralSerializer(referrals, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

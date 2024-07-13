@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
-from users.views import (ArcticleViewSet, UserRegisterView, UserLoginView,
+from users.views import (ArcticleViewSet, ReferralListView, UserRegisterView, UserLoginView,
                          UserViewSet, ReferralCodeViewSet, GetReferralCodeByEmailView,
                          RegisterWithReferralCodeView)
 from rest_framework_simplejwt.views import (
@@ -30,7 +30,7 @@ from rest_framework_simplejwt.views import (
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'arcticles', ArcticleViewSet, basename='arcticle')
-router.register(r'referral', ReferralCodeViewSet, basename='referral')
+router.register(r'referral_codes', ReferralCodeViewSet, basename='referral')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,6 +40,7 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('api/v1/referral/by-email/', GetReferralCodeByEmailView.as_view(), name='get_referral_by_email'),
     path('api/v1/register/referral/', RegisterWithReferralCodeView.as_view(), name='register_with_referral'),
+    path('api/v1/referrals/<int:referrer_id>/', ReferralListView.as_view(), name='referral_list'),
     path('api/v1/', include(router.urls)),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
