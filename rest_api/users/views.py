@@ -1,4 +1,3 @@
-# users/views.py
 import uuid
 from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
@@ -11,6 +10,9 @@ from .serializers import (ReferralSerializer, UserLoginSerializer, ArcticleSeria
                           ReferralCodeSerializer)
 from django.contrib.auth.models import User
 from django.utils import timezone
+
+# TODO: все I/O bound операции должны быть асинхронными;
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
