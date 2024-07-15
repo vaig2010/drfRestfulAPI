@@ -98,10 +98,10 @@ class RegisterWithReferralCodeView(APIView):
         referral_code = request.data.get('referral_code')
         username = request.data.get('username')
         password = request.data.get('password')
+        email = request.data.get('email')
 
         if not referral_code or not username or not password:
             return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             referral = ReferralCode.objects.get(code=referral_code)
         except ReferralCode.DoesNotExist:
@@ -110,7 +110,7 @@ class RegisterWithReferralCodeView(APIView):
         if not referral.is_active():
             return Response({"error": "Referral code is expired."}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(username=username, password=password , email=email)
         Referral.objects.create(referrer=referral.user, referee=user)
         
         return Response({"success": "User registered successfully."}, status=status.HTTP_201_CREATED)

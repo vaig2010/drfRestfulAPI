@@ -28,11 +28,11 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 
-# Routers provide an easy way of automatically determining the URL conf.
+
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'arcticles', ArcticleViewSet, basename='arcticle')
-router.register(r'referral_codes', ReferralCodeViewSet, basename='referral')
+router.register(r'referral_codes', ReferralCodeViewSet, basename='referral_codes')
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -53,13 +53,19 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
+    
+    # Referrals
     path('api/v1/referral/by-email/', GetReferralCodeByEmailView.as_view(), name='get_referral_by_email'),
-    path('api/v1/register/referral/', RegisterWithReferralCodeView.as_view(), name='register_with_referral'),
     path('api/v1/referrals/<int:referrer_id>/', ReferralListView.as_view(), name='referral_list'),
+    path('api/v1/referral_code/register/', RegisterWithReferralCodeView.as_view(), name='register_with_referral'),
     path('api/v1/', include(router.urls)),
+    
+    # JWT Tokens 
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    
+    # Docs
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

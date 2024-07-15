@@ -1,9 +1,7 @@
-import uuid
 from rest_framework import serializers
 from .models import Arcticle, ReferralCode, Referral
 from django.contrib.auth.models import User
-from django.utils import timezone
-# Serializers define the API representation.
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -19,6 +17,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if value and User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with that email already exists.")
         return value
+    
     def create(self, validated_data):
         user = User(
             username=validated_data['username'],
@@ -50,7 +49,6 @@ class ArcticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Arcticle
         fields = ['id', 'title', 'content']
-        
 
 class ReferralCodeSerializer(serializers.ModelSerializer):
     class Meta:
